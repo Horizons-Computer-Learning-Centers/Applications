@@ -25,7 +25,7 @@ jobs:
       - name: Replace secrets in appsettings.json
         shell: pwsh
         run: |
-          cd "Horizons.core.Auth/Horizons.core.Auth"
+          cd "Horizons.core.Auth"
           Write-Host "Replacing secrets in appsettings.json"
           $json = Get-Content appsettings.json | ConvertFrom-Json
           $json.ConnectionStrings.AuthContext = '${{ secrets.AUTH_CONNECTION_STRING }}'
