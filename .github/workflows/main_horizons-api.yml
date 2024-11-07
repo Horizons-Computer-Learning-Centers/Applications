@@ -21,19 +21,6 @@ jobs:
         with:
           dotnet-version: '8.x'
 
-      - name: Replace secrets in appsettings.json
-        shell: pwsh
-        run: |
-          cd "Horizons.core.Api/Horizons.core.Auth"
-          Write-Host "Replacing secrets in appsettings.json"
-          $json = Get-Content appsettings.json | ConvertFrom-Json
-          $json.ConnectionStrings.AuthContext = '${{ secrets.AUTH_CONNECTION_STRING }}'
-          $json.Jwt.JwtKey = '${{ secrets.JWT_KEY }}'
-          $json.Jwt.JwtIssuer = '${{ secrets.JWT_ISSUER }}'
-          $json.Jwt.JwtAudience = '${{ secrets.JWT_AUDIENCE }}'
-          $json.Jwt.JwtExpireDays = '${{ secrets.JWT_EXPIRE_DAYS }}'
-          $json | ConvertTo-Json -Depth 10 | Set-Content appsettings.json
-
       - name: Build with dotnet
         run: dotnet build "Horizons.core.Api/Horizons.core.Api.sln" --configuration Release
 
