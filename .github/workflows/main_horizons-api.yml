@@ -18,6 +18,24 @@ jobs:
         with:
           dotnet-version: '8.x'
 
+      - name: Update appsettings.json
+        shell: pwsh
+        run: |
+          $content = @"
+          {
+            "ConnectionStrings": {
+              "AuthContext": "${{ secrets.AUTH_CONNECTION_STRING }}"
+            },
+            "Jwt": {
+              "JwtKey": "${{ secrets.JWT_KEY }}",
+              "JwtIssuer": "${{ secrets.JWT_ISSUER }}",
+              "JwtAudience": "${{ secrets.JWT_AUDIENCE }}",
+              "JwtExpireDays": "${{ secrets.JWT_EXPIRE_DAYS }}"
+            }
+          }
+          "@
+          Set-Content -Path "Horizons.core.Api/Horizons.core.Api/appsettings.json" -Value $content -Encoding utf8
+
       - name: Build with dotnet
         run: dotnet build "Horizons.core.Api/Horizons.core.Api.sln" --configuration Release
 
