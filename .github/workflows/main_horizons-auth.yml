@@ -19,27 +19,6 @@ jobs:
           dotnet-version: '8.x'
           include-prerelease: true
 
-      - name: Replace secrets in appsettings.json
-        shell: pwsh
-        run: |
-          Write-Host "Replacing secrets in appsettings.json"
-          $repoRoot = Split-Path $env:GITHUB_WORKSPACE -Parent
-          $appSettingsPath = Join-Path $repoRoot 'Horizons.core.Auth\appsettings.json'
-          Write-Host "Looking for appsettings.json at $appSettingsPath"
-      
-          if (Test-Path $appSettingsPath) {
-              Write-Host "Found appsettings.json"
-              $json = Get-Content $appSettingsPath | ConvertFrom-Json
-              $json.ConnectionStrings.AuthContext = '${{ secrets.AUTH_CONNECTION_STRING }}'
-              $json.Jwt.JwtKey = '${{ secrets.JWT_KEY }}'
-              $json.Jwt.JwtIssuer = '${{ secrets.JWT_ISSUER }}'
-              $json.Jwt.JwtAudience = '${{ secrets.JWT_AUDIENCE }}'
-              $json.Jwt.JwtExpireDays = '${{ secrets.JWT_EXPIRE_DAYS }}'
-              $json | ConvertTo-Json -Depth 10 | Set-Content $appSettingsPath
-          } else {
-              Write-Error "appsettings.json not found at $appSettingsPath"
-          }
-
       - name: Build with dotnet
         run: dotnet build "Horizons.core.Auth/Horizons.core.Auth.sln" --configuration Release
 
