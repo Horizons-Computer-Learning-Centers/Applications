@@ -19,7 +19,7 @@ jobs:
           dotnet-version: '8.x'
 
       - name: Build with dotnet
-        run: dotnet build "Horizons.core.Api/Horizons.core.Api/Horizons.core.Api.csproj" --configuration Release
+        run: dotnet build "Horizons.core.Api/Horizons.core.Api.sln" --configuration Release
 
       - name: dotnet publish
         run: dotnet publish "Horizons.core.Api/Horizons.core.Api/Horizons.core.Api.cproj" -c Release -o "${{env.DOTNET_ROOT}}/myapp"
