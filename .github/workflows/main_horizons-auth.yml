@@ -26,7 +26,7 @@ jobs:
         shell: pwsh
         run: |
           Write-Host "Replacing secrets in appsettings.json"
-          $appSettingsPath = Join-Path $env:GITHUB_WORKSPACE 'Horizons.core.Auth\appsettings.json'
+          $appSettingsPath = Join-Path 'Horizons.core.Auth\appsettings.json'
           $json = Get-Content $appSettingsPath | ConvertFrom-Json
           $json.ConnectionStrings.AuthContext = '${{ secrets.AUTH_CONNECTION_STRING }}'
           $json.Jwt.JwtKey = '${{ secrets.JWT_KEY }}'
