@@ -1,5 +1,4 @@
-﻿using Horizons.Core.Auth.Constants;
-using Horizons.Core.Auth.Dtos;
+﻿using Horizons.Core.Auth.Dtos;
 using Horizons.Core.Auth.Identity.Interface;
 using Horizons.Core.Auth.Models;
 using Horizons.Core.Auth.Repository.Interface;
@@ -50,8 +49,8 @@ namespace Horizons.Core.Auth.Repository
             var result = await _userManager.CreateAsync(user, register.Password);
             if (result.Succeeded)
             {
-                register.Roles.Add(HorizonsCoreAuthRoles.UserRole);
-                await AssignRole(user.Email, register.Roles);
+                user = await _userManager.FindByEmailAsync(register.Email);
+                await _userManager.AddToRoleAsync(user, "User");
                 return new RequestResponse
                 {
                     Message = "User was created",
@@ -101,34 +100,6 @@ namespace Horizons.Core.Auth.Repository
                 IsSuccess = false,
                 Message = "Login failed"
             }; ;
-        }
-
-        public async Task<IList<string>> AssignRole(string email, List<string> roles)
-        {
-            var user = await _userManager.FindByEmailAsync(email);
-            if (user == null)
-            {
-                return null;
-            }
-
-            List<string> rolesToAdd = new List<string>();
-
-            foreach (var role in roles)
-            {
-                if (!_roleManager.RoleExistsAsync(role).GetAwaiter().GetResult())
-                {
-                    rolesToAdd.Add(role);
-                }
-            }
-
-            await CreateRole(rolesToAdd);
-
-            foreach (var role in rolesToAdd)
-            {
-                await _userManager.AddToRoleAsync(user, role);
-            }
-            
-            return await _userManager.GetRolesAsync(user);
         }
 
         public async Task<RequestResponse> ForgotPassword(ForgotPasswordRequest model)
