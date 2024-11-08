@@ -1,8 +1,7 @@
 ﻿namespace Horizons.Core.Auth.Dtos
 {
-    public class LoginRequestDto
+    public class ForgotPasswordRequest
     {
         public string Email { get; set; }
-        public string Password { get; set; }
     }
 }
