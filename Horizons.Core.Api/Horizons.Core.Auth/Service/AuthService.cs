@@ -39,7 +39,7 @@ namespace Horizons.Core.Auth.Service
             return _authRepository.UserExists(email);
         }
 
-        public async Task<RequestResponse> Login(LoginRequest loginRequestDto)
+        public async Task<RequestResponse> Login(LoginRequest? loginRequestDto)
         {
             return await _authRepository.Login(loginRequestDto);
         }

@@ -89,36 +89,59 @@ namespace Horizons.Core.Auth.Repository
             return user != null;
         }
 
-        public async Task<RequestResponse> Login(LoginRequest loginDto)
+        public async Task<RequestResponse> Login(LoginRequest? loginDto)
         {
-            var user = await _userManager.FindByEmailAsync(loginDto.Email);
-            if (user != null && await _userManager.CheckPasswordAsync(user, loginDto.Password))
+            // Validate input
+            if (loginDto == null || string.IsNullOrWhiteSpace(loginDto.Email) || string.IsNullOrWhiteSpace(loginDto.Password))
             {
-                var roles = await _userManager.GetRolesAsync(user);
-                var token = _jwtProviders.GenerateJwtToken(user, roles);
-
                 return new RequestResponse
                 {
-                    Result = new
-                    {
-                        Id = user.Id,
-                        Email = user.Email,
-                        FirstName = user.FirstName,
-                        LastName = user.LastName,
-                        PhoneNumber = user.PhoneNumber,
-                        Token = token
-                    },
-                    IsSuccess = true,
-                    Message = null
+                    IsSuccess = false,
+                    Message = "Invalid login request"
                 };
             }
 
+            var user = await _userManager.FindByEmailAsync(loginDto.Email);
+            if (user == null)
+            {
+                return new RequestResponse
+                {
+                    IsSuccess = false,
+                    Message = "User not found"
+                };
+            }
+
+            // Check password validity
+            var isPasswordValid = await _userManager.CheckPasswordAsync(user, loginDto.Password);
+            if (!isPasswordValid)
+            {
+                return new RequestResponse
+                {
+                    IsSuccess = false,
+                    Message = "Incorrect password"
+                };
+            }
+
+            // Get user roles and generate token
+            var roles = await _userManager.GetRolesAsync(user);
+            var token = _jwtProviders.GenerateJwtToken(user, roles);
+
             return new RequestResponse
             {
-                IsSuccess = false,
-                Message = "Login failed"
-            }; ;
+                Result = new
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    PhoneNumber = user.PhoneNumber,
+                    Token = token
+                },
+                IsSuccess = true,
+                Message = "Login successful"
+            };
         }
+
 
         public async Task<RequestResponse> ForgotPassword(ForgotPasswordRequest model)
         {

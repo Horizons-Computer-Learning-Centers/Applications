@@ -21,10 +21,14 @@ namespace Horizons.Core.Auth.Identity
             {
                 new(ClaimTypes.Name, user.FirstName),
                 new(ClaimTypes.Name, user.LastName),
-                new(ClaimTypes.Name, user.PhoneNumber),
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(ClaimTypes.Name, user.Email),
             };
+
+            if (user.PhoneNumber is not null)
+            {
+                claims.Add(new(ClaimTypes.Name, user.PhoneNumber));
+            }
 
             foreach(var userRole in roles)
             {

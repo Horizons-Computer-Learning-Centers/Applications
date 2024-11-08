@@ -19,22 +19,11 @@ namespace Horizons.Core.Auth.Controllers
         public async Task<RequestResponse> Register(RegistrationRequest register)
         {
 
-            try
-            {
-                return await _authService.Register(register);
-            }
-            catch (Exception e)
-            {
-                return new RequestResponse
-                {
-                    Message = "Message: " + e.Message + ", StackTrace: " + e.StackTrace + ", Source: " + e.Source,
-                    IsSuccess = false
-                };
-            }
+            return await _authService.Register(register);
         }
 
         [HttpPost("login")]
-        public async Task<RequestResponse> Login(LoginRequest loginDto)
+        public async Task<RequestResponse> Login(LoginRequest? loginDto)
         {
             return await _authService.Login(loginDto);
         }
