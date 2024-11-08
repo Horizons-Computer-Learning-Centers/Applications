@@ -51,6 +51,7 @@ namespace Horizons.Core.Auth.Repository
             if (result.Succeeded)
             {
                 register.Roles.Add(HorizonsCoreAuthRoles.UserRole);
+                await AssignRole(user.Email, register.Roles);
                 return new RequestResponse
                 {
                     Message = "User was created",
