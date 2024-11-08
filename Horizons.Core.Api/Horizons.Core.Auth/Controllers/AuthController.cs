@@ -39,12 +39,6 @@ namespace Horizons.Core.Auth.Controllers
             return await _authService.Login(loginDto);
         }
 
-        [HttpPost("assign-role")]
-        public async Task<IList<string>> AssignRole(string email, List<string> roles)
-        {
-            return await _authService.AssignRole(email, roles);
-        }
-
         [HttpPost("reset-password")]
         public async Task<RequestResponse> ResetPassword(ResetPasswordRequest model)
         {

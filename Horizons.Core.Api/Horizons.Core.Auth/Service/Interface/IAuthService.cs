@@ -7,7 +7,6 @@ namespace Horizons.Core.Auth.Service.Interface
         Task<RequestResponse> Register(RegistrationRequest register);
         Task<bool> UserExists(string email);
         Task<RequestResponse> Login(LoginRequest loginDto);
-        Task<IList<string>> AssignRole(string email, List<string> roles);
         Task<RequestResponse> ForgotPassword(ForgotPasswordRequest model);
         Task<RequestResponse> ResetPassword(ResetPasswordRequest model);
         Task<RequestResponse> ConfirmEmail(string userId, string token);

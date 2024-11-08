@@ -13,11 +13,6 @@ namespace Horizons.Core.Auth.Service
             _authRepository = authRepository;
         }
 
-        public async Task<IList<string>> AssignRole(string email, List<string> roles)
-        {
-            return await _authRepository.AssignRole(email, roles);
-        }
-
         public async Task<RequestResponse> ForgotPassword(ForgotPasswordRequest model)
         {
             var response = await _authRepository.ForgotPassword(model);
