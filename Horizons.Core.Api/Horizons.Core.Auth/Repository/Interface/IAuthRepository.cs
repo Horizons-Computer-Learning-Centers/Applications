@@ -4,7 +4,7 @@ namespace Horizons.Core.Auth.Repository.Interface
 {
     public interface IAuthRepository
     {
-        Task<RequestResponse> Register(RegistrationRequestDto registerDto);
+        Task<RequestResponse> Register(RegistrationRequest register);
         Task<bool> UserExists(string email);
         Task<RequestResponse> Login(LoginRequest loginDto);
         Task<IList<string>> AssignRole(string email, List<string> roles);

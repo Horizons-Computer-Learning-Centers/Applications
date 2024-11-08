@@ -34,9 +34,9 @@ namespace Horizons.Core.Auth.Service
             return await _authRepository.ConfirmEmail(userId, token);
         }
 
-        public async Task<RequestResponse> Register(RegistrationRequestDto registerDto)
+        public async Task<RequestResponse> Register(RegistrationRequest register)
         {
-            return await _authRepository.Register(registerDto);
+            return await _authRepository.Register(register);
         }
 
         public Task<bool> UserExists(string email)

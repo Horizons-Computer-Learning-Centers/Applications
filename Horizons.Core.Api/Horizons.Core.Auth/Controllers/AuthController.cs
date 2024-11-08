@@ -16,10 +16,10 @@ namespace Horizons.Core.Auth.Controllers
         }
         
         [HttpPost("register")]
-        public async Task<RequestResponse> Register(RegistrationRequestDto registerDto)
+        public async Task<RequestResponse> Register(RegistrationRequest register)
         {
 
-            return await _authService.Register(registerDto);
+            return await _authService.Register(register);
         }
 
         [HttpPost("login")]

@@ -26,18 +26,18 @@ namespace Horizons.Core.Auth.Repository
             _jwtProviders = jwtProviders;
         }
         
-        public async Task<RequestResponse> Register(RegistrationRequestDto registerDto)
+        public async Task<RequestResponse> Register(RegistrationRequest register)
         {
             ApplicationUser user = new ApplicationUser
             {
-                UserName = registerDto.Email,
-                Email = registerDto.Email,
-                PhoneNumber = registerDto.PhoneNumber,
-                FirstName = registerDto.FirstName,
-                LastName = registerDto.LastName
+                UserName = register.Email,
+                Email = register.Email,
+                PhoneNumber = register.PhoneNumber,
+                FirstName = register.FirstName,
+                LastName = register.LastName
             };
 
-            var userExists = await UserExists(registerDto.Email);
+            var userExists = await UserExists(register.Email);
             if (userExists)
             {
                 return new RequestResponse
@@ -47,10 +47,10 @@ namespace Horizons.Core.Auth.Repository
                 };
             }
 
-            var result = await _userManager.CreateAsync(user, registerDto.Password);
+            var result = await _userManager.CreateAsync(user, register.Password);
             if (result.Succeeded)
             {
-                registerDto.Roles.Add(HorizonsCoreAuthRoles.UserRole);
+                register.Roles.Add(HorizonsCoreAuthRoles.UserRole);
                 return new RequestResponse
                 {
                     Message = "User was created",

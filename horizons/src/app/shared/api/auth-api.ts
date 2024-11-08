@@ -20,7 +20,7 @@ export interface IAuthService {
      * @param body (optional) 
      * @return Success
      */
-    register(body: RegistrationRequestDto | undefined): Observable<RequestResponse>;
+    register(body: RegistrationRequest | undefined): Observable<RequestResponse>;
     /**
      * @param body (optional) 
      * @return Success
@@ -67,7 +67,7 @@ export class AuthService implements IAuthService {
      * @param body (optional) 
      * @return Success
      */
-    register(body: RegistrationRequestDto | undefined): Observable<RequestResponse> {
+    register(body: RegistrationRequest | undefined): Observable<RequestResponse> {
         let url_ = this.baseUrl + "/api/auth/register";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -413,7 +413,7 @@ export interface LoginRequest {
     password?: string | undefined;
 }
 
-export interface RegistrationRequestDto {
+export interface RegistrationRequest {
     email?: string | undefined;
     firstName?: string | undefined;
     lastName?: string | undefined;
