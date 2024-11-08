@@ -3,14 +3,14 @@
   "defaultVariables": null,
   "documentGenerator": {
     "fromDocument": {
-      "url": "https://localhost:7048/swagger/v1/swagger.json",
+      "url": "https://localhost:5001/swagger/v1/swagger.json",
       "output": null,
       "newLineBehavior": "Auto"
     }
   },
   "codeGenerators": {
     "openApiToTypeScriptClient": {
-      "className": "{controller}Client",
+      "className": "{controller}Service",
       "moduleName": "",
       "namespace": "",
       "typeScriptVersion": 4.3,
@@ -57,7 +57,7 @@
       "convertConstructorInterfaceData": false,
       "importRequiredTypes": true,
       "useGetBaseUrlMethod": false,
-      "baseUrlTokenName": "API_BASE_URL",
+      "baseUrlTokenName": "AUTH_BASE_URL",
       "queryNullValue": "",
       "useAbortSignal": false,
       "inlineNamedDictionaries": false,
@@ -66,7 +66,7 @@
       "templateDirectory": null,
       "serviceHost": null,
       "serviceSchemes": null,
-      "output": null,
+      "output": "../auth-api.ts",
       "newLineBehavior": "Auto"
     }
   }

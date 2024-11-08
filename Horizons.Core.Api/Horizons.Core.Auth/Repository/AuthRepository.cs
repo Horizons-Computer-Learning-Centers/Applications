@@ -26,7 +26,7 @@ namespace Horizons.Core.Auth.Repository
             _jwtProviders = jwtProviders;
         }
         
-        public async Task<ResponseDto> Register(RegistrationRequestDto registerDto)
+        public async Task<RequestResponse> Register(RegistrationRequestDto registerDto)
         {
             ApplicationUser user = new ApplicationUser
             {
@@ -37,26 +37,41 @@ namespace Horizons.Core.Auth.Repository
                 LastName = registerDto.LastName
             };
 
+            var userExists = await UserExists(registerDto.Email);
+            if (userExists)
+            {
+                return new RequestResponse
+                {
+                    Message = "User already exists",
+                    IsSuccess = false
+                };
+            }
+
             var result = await _userManager.CreateAsync(user, registerDto.Password);
             if (result.Succeeded)
             {
                 registerDto.Roles.Add(HorizonsCoreAuthRoles.UserRole);
-                var roles = await AssignRole(user.Email, registerDto.Roles);
-                return new ResponseDto
+                return new RequestResponse
                 {
                     Message = "User was created",
                     IsSuccess = true
                 };
             }
 
-            return new ResponseDto
+            return new RequestResponse
             {
                 Message = result.Errors.First().Description,
                 IsSuccess = false
             };
         }
 
-        public async Task<ResponseDto> Login(LoginRequestDto loginDto)
+        public async Task<bool> UserExists(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            return user != null;
+        }
+
+        public async Task<RequestResponse> Login(LoginRequest loginDto)
         {
             var user = await _userManager.FindByEmailAsync(loginDto.Email);
             if (user != null && await _userManager.CheckPasswordAsync(user, loginDto.Password))
@@ -64,7 +79,7 @@ namespace Horizons.Core.Auth.Repository
                 var roles = await _userManager.GetRolesAsync(user);
                 var token = _jwtProviders.GenerateJwtToken(user, roles);
 
-                return new ResponseDto
+                return new RequestResponse
                 {
                     Result = new
                     {
@@ -73,7 +88,6 @@ namespace Horizons.Core.Auth.Repository
                         FirstName = user.FirstName,
                         LastName = user.LastName,
                         PhoneNumber = user.PhoneNumber,
-                        Roles = string.Join(",", roles),
                         Token = token
                     },
                     IsSuccess = true,
@@ -81,7 +95,11 @@ namespace Horizons.Core.Auth.Repository
                 };
             }
 
-            return new ResponseDto();
+            return new RequestResponse
+            {
+                IsSuccess = false,
+                Message = "Login failed"
+            }; ;
         }
 
         public async Task<IList<string>> AssignRole(string email, List<string> roles)
@@ -111,7 +129,73 @@ namespace Horizons.Core.Auth.Repository
             
             return await _userManager.GetRolesAsync(user);
         }
-        
+
+        public async Task<RequestResponse> ForgotPassword(ForgotPasswordRequest model)
+        {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                return new RequestResponse { IsSuccess = false, Message = "User not found" };
+            }
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            // Here you would typically send the token to the user's email.
+            // For example, you might use an email service to send the token.
+
+            return new RequestResponse { IsSuccess = true, Message = "Password reset token generated", Result = token };
+        }
+
+        public async Task<RequestResponse> ResetPassword(ResetPasswordRequest model)
+        {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user is null)
+            {
+                return new RequestResponse
+                {
+                    IsSuccess = false,
+                    Message = "User does not exist"
+                };
+            }
+
+            var purpose = _userManager.Options.Tokens.PasswordResetTokenProvider;
+            bool isTokenValid = await _userManager.VerifyUserTokenAsync(user, purpose, "ResetPassword", model.Token);
+
+            if (!isTokenValid)
+            {
+                return new RequestResponse
+                {
+                    IsSuccess = false,
+                    Message = "Invalid or expired token"
+                };
+            }
+            
+            var result = await _userManager.ResetPasswordAsync(user, model.Token, model.NewPassword);
+            if (result.Succeeded)
+            {
+                return new RequestResponse { IsSuccess = true, Message = "Password reset successful" };
+            }
+
+            return new RequestResponse { IsSuccess = false, Message = "Password reset failed" };
+
+        }
+
+        public async Task<RequestResponse> ConfirmEmail(string userId, string token)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return new RequestResponse { IsSuccess = false, Message = "User not found" };
+            }
+
+            var result = await _userManager.ConfirmEmailAsync(user, token);
+            if (result.Succeeded)
+            {
+                return new RequestResponse { IsSuccess = true, Message = "Email confirmed successfully" };
+            }
+
+            return new RequestResponse { IsSuccess = false, Message = result.Errors.First().Description };
+        }
+
         private async Task CreateRole(List<string> roles)
         {
             foreach (var role in roles)

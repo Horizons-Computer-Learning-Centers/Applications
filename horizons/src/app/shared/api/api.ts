@@ -15,7 +15,7 @@ import { HttpClient, HttpHeaders, HttpResponse, HttpResponseBase } from '@angula
 
 export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
 
-export interface IWeatherForecastClient {
+export interface IWeatherForecastService {
     /**
      * @return OK
      */
@@ -25,7 +25,7 @@ export interface IWeatherForecastClient {
 @Injectable({
     providedIn: 'root'
 })
-export class WeatherForecastClient implements IWeatherForecastClient {
+export class WeatherForecastService implements IWeatherForecastService {
     private http: HttpClient;
     private baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;

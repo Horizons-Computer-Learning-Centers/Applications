@@ -4,8 +4,12 @@ namespace Horizons.Core.Auth.Service.Interface
 {
     public interface IAuthService
     {
-        Task<ResponseDto> Register(RegistrationRequestDto registerDto);
-        Task<ResponseDto> Login(LoginRequestDto loginDto);
+        Task<RequestResponse> Register(RegistrationRequestDto registerDto);
+        Task<bool> UserExists(string email);
+        Task<RequestResponse> Login(LoginRequest loginDto);
         Task<IList<string>> AssignRole(string email, List<string> roles);
+        Task<RequestResponse> ForgotPassword(ForgotPasswordRequest model);
+        Task<RequestResponse> ResetPassword(ResetPasswordRequest model);
+        Task<RequestResponse> ConfirmEmail(string userId, string token);
     }
 }
