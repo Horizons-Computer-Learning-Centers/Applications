@@ -1,4 +1,5 @@
-﻿using Horizons.Core.Auth.Dtos;
+﻿using Horizons.Core.Auth.Constants;
+using Horizons.Core.Auth.Dtos;
 using Horizons.Core.Auth.Identity.Interface;
 using Horizons.Core.Auth.Models;
 using Horizons.Core.Auth.Repository.Interface;
@@ -24,9 +25,20 @@ namespace Horizons.Core.Auth.Repository
             _signInManager = signInManager;
             _jwtProviders = jwtProviders;
         }
-        
+
         public async Task<RequestResponse> Register(RegistrationRequest register)
         {
+            // Check if user already exists
+            if (await UserExists(register.Email))
+            {
+                return new RequestResponse
+                {
+                    Message = "User already exists",
+                    IsSuccess = false
+                };
+            }
+
+            // Create new user instance
             ApplicationUser user = new ApplicationUser
             {
                 UserName = register.Email,
@@ -36,32 +48,38 @@ namespace Horizons.Core.Auth.Repository
                 LastName = register.LastName
             };
 
-            var userExists = await UserExists(register.Email);
-            if (userExists)
+            // Create user
+            var result = await _userManager.CreateAsync(user, register.Password);
+            if (!result.Succeeded)
             {
                 return new RequestResponse
                 {
-                    Message = "User already exists",
+                    Message = result.Errors.First().Description,
                     IsSuccess = false
                 };
             }
 
-            var result = await _userManager.CreateAsync(user, register.Password);
-            if (result.Succeeded)
+            // Ensure the user role exists
+            if (!await _roleManager.RoleExistsAsync(HorizonsCoreAuthRoles.UserRole))
             {
-                user = await _userManager.FindByEmailAsync(register.Email);
-                await _userManager.AddToRoleAsync(user, "User");
-                return new RequestResponse
+                var roleCreationResult = await _roleManager.CreateAsync(new IdentityRole(HorizonsCoreAuthRoles.UserRole));
+                if (!roleCreationResult.Succeeded)
                 {
-                    Message = "User was created",
-                    IsSuccess = true
-                };
+                    return new RequestResponse
+                    {
+                        Message = roleCreationResult.Errors.First().Description,
+                        IsSuccess = false
+                    };
+                }
             }
+
+            // Assign user to role
+            await _userManager.AddToRoleAsync(user, HorizonsCoreAuthRoles.UserRole);
 
             return new RequestResponse
             {
-                Message = result.Errors.First().Description,
-                IsSuccess = false
+                Message = "User was created",
+                IsSuccess = true
             };
         }
 
