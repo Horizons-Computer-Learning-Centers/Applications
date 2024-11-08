@@ -27,7 +27,7 @@ namespace Horizons.Core.Auth.Controllers
             {
                 return new RequestResponse
                 {
-                    Message = e.Message,
+                    Message = "Message: " + e.Message + ", StackTrace: " + e.StackTrace + ", Source: " + e.Source,
                     IsSuccess = false
                 };
             }
