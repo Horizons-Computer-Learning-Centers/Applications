@@ -18,11 +18,10 @@ export class RegisterComponent implements OnInit {
 
   ngOnInit(): void {
     this.form = this.fb.group({
-      firstName: ['', [Validators.required, Validators.email]],
-      lastName: ['', [Validators.required, Validators.email]],
+      firstName: ['', [Validators.required]],
+      lastName: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', [Validators.required, Validators.minLength(6)]],
+      password: ['', [Validators.required, Validators.minLength(3)]],
     });
   }
 
@@ -31,20 +30,13 @@ export class RegisterComponent implements OnInit {
   }
 
   onSubmit() {
+    console.log(this.form);
     this.submitted = true;
     if (this.form.invalid) {
       return;
     }
 
-    const user: RegistrationRequest = {
-      email: this.form.value.email,
-      firstName: this.form.value.firstName,
-      lastName: this.form.value.lastName,
-      password: this.form.value.email,
-      roles: ['User', 'Admin'],
-    };
-
-    this.authService.register(user).subscribe((response) => {
+    this.authService.register(this.form.value).subscribe((response) => {
       console.log(response);
     });
   }
