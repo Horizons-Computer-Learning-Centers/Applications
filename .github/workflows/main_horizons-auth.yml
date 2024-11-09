@@ -80,7 +80,7 @@ jobs:
           {
             "ConnectionStrings": {
               "AuthContext": "${{ secrets.AUTH_CONNECTION_STRING }}",
-              "CommunicationServices": "${{ COMMUNICATION_SERVICES_CONNECTION_STRING }}"
+              "CommunicationServices": "${{ secrets.COMMUNICATION_SERVICES_CONNECTION_STRING }}"
             },
             "Jwt": {
               "JwtKey": "${{ secrets.JWT_KEY }}",
