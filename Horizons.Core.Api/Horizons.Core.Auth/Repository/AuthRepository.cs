@@ -63,12 +63,6 @@ namespace Horizons.Core.Auth.Repository
                     IsSuccess = false
                 };
             }
-
-            //await _mailSender.SendEmailAsync(
-            //    user.Email, "Email Confirmation", 
-            //    "Please confirm your email by clicking this " +
-            //    "link: <a href='https://horizon-centers.com/confirm-email/" + user.Id + "/" + await _userManager.GenerateEmailConfirmationTokenAsync(user) + 
-            //    "'>Confirm Email</a>");
             
             var token = HttpUtility.UrlEncode(await _userManager.GenerateEmailConfirmationTokenAsync(user));
 
@@ -219,6 +213,7 @@ namespace Horizons.Core.Auth.Repository
                 return new RequestResponse { IsSuccess = false, Message = "User not found" };
             }
 
+            token = HttpUtility.UrlDecode(token);
             var result = await _userManager.ConfirmEmailAsync(user, token);
             if (result.Succeeded)
             {

@@ -9,8 +9,7 @@ import { catchError, of } from 'rxjs';
   styleUrls: ['./confirm-email.component.scss'],
 })
 export class ConfirmEmailComponent implements OnInit {
-  errorMessage = '';
-  successMessage = '';
+  successMessage: any;
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -34,18 +33,14 @@ export class ConfirmEmailComponent implements OnInit {
           catchError((error) => {
             // Handle the error here
             console.error('Error confirming email:', error);
-            // Optionally show an error message to the user
-            this.errorMessage =
-              'There was an error confirming your email. Please try again later.';
-            // Return an empty observable to complete the observable stream
+            this.successMessage = error;
             return of(null);
           })
         )
         .subscribe((response) => {
           if (response) {
             // Handle successful confirmation here
-            console.log('Email confirmed successfully:', response);
-            this.successMessage = 'Your email has been successfully confirmed!';
+            this.successMessage = response;
           }
         });
     }

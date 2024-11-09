@@ -1,16 +1,8 @@
 <h1>Confirm your email</h1>
 
-<div
-  *ngIf="successMessage && successMessage.length > 0"
-  class="alert alert-success"
-  role="alert"
->
+<div *ngIf="successMessage.isSuccess" class="alert alert-success" role="alert">
   Your email was confirmed.
 </div>
-<div
-  *ngIf="errorMessage && errorMessage.length > 0"
-  class="alert alert-danger"
-  role="alert"
->
+<div *ngIf="!successMessage.isSuccess" class="alert alert-danger" role="alert">
   Your email could not be confirmed
 </div>
