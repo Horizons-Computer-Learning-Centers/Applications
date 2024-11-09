@@ -87,6 +87,9 @@ jobs:
               "JwtIssuer": "${{ secrets.JWT_ISSUER }}",
               "JwtAudience": "${{ secrets.JWT_AUDIENCE }}",
               "JwtExpireDays": "${{ secrets.JWT_EXPIRE_DAYS }}"
+            },
+            "AppUrls": {
+              "Frontend": "https://horizon-centers.com"
             }
           }
           "@
