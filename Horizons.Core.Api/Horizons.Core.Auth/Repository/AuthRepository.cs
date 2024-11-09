@@ -1,5 +1,4 @@
 ﻿using System.Net;
-using System.Web;
 using Horizons.Core.Auth.Configuration;
 using Horizons.Core.Auth.Constants;
 using Horizons.Core.Auth.Dtos;
@@ -8,7 +7,6 @@ using Horizons.Core.Auth.Models;
 using Horizons.Core.Auth.Repository.Interface;
 using Horizons.Core.Auth.Service.Interface;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Options;
 
 namespace Horizons.Core.Auth.Repository
 {
@@ -220,7 +218,6 @@ namespace Horizons.Core.Auth.Repository
                 return new RequestResponse { IsSuccess = false, Message = "User not found" };
             }
 
-            //token = WebUtility.UrlDecode(token);
             var result = await _userManager.ConfirmEmailAsync(user, token);
             if (result.Succeeded)
             {
