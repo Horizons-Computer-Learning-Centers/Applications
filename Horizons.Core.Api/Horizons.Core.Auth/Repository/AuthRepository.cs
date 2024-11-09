@@ -62,11 +62,17 @@ namespace Horizons.Core.Auth.Repository
                     IsSuccess = false
                 };
             }
-            
+
+            //await _mailSender.SendEmailAsync(
+            //    user.Email, "Email Confirmation", 
+            //    "Please confirm your email by clicking this " +
+            //    "link: <a href='https://horizon-centers.com/confirm-email/" + user.Id + "/" + await _userManager.GenerateEmailConfirmationTokenAsync(user) + 
+            //    "'>Confirm Email</a>");
+
             await _mailSender.SendEmailAsync(
-                user.Email, "Email Confirmation", 
+                user.Email, "Email Confirmation",
                 "Please confirm your email by clicking this " +
-                "link: <a href='https://horizon-centers.com/confirm-email/" + user.Id + "/" + await _userManager.GenerateEmailConfirmationTokenAsync(user) + 
+                "link: <a href='https://horizon-centers.com/confirm-email/" + user.Id + "/dfsasvvxcvzxadsgdbncdghfndfdasdcasdfdfsdfasd" +
                 "'>Confirm Email</a>");
 
             // Ensure the user role exists
