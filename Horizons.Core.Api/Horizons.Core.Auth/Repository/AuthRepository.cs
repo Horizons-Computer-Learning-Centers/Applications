@@ -1,4 +1,5 @@
-﻿using System.Web;
+﻿using System.Net;
+using System.Web;
 using Horizons.Core.Auth.Constants;
 using Horizons.Core.Auth.Dtos;
 using Horizons.Core.Auth.Identity.Interface;
@@ -64,7 +65,8 @@ namespace Horizons.Core.Auth.Repository
                 };
             }
             
-            var token = HttpUtility.UrlEncode(await _userManager.GenerateEmailConfirmationTokenAsync(user));
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            token = WebUtility.UrlEncode(token);
 
             await _mailSender.SendEmailAsync(
                 user.Email, "Email Confirmation",
@@ -213,7 +215,7 @@ namespace Horizons.Core.Auth.Repository
                 return new RequestResponse { IsSuccess = false, Message = "User not found" };
             }
 
-            token = HttpUtility.UrlDecode(token);
+            token = WebUtility.UrlDecode(token);
             var result = await _userManager.ConfirmEmailAsync(user, token);
             if (result.Succeeded)
             {
