@@ -1,4 +1,5 @@
-﻿using Horizons.Core.Auth.Constants;
+﻿using System.Web;
+using Horizons.Core.Auth.Constants;
 using Horizons.Core.Auth.Dtos;
 using Horizons.Core.Auth.Identity.Interface;
 using Horizons.Core.Auth.Models;
@@ -68,11 +69,13 @@ namespace Horizons.Core.Auth.Repository
             //    "Please confirm your email by clicking this " +
             //    "link: <a href='https://horizon-centers.com/confirm-email/" + user.Id + "/" + await _userManager.GenerateEmailConfirmationTokenAsync(user) + 
             //    "'>Confirm Email</a>");
+            
+            var token = HttpUtility.UrlEncode(await _userManager.GenerateEmailConfirmationTokenAsync(user));
 
             await _mailSender.SendEmailAsync(
                 user.Email, "Email Confirmation",
                 "Please confirm your email by clicking this " +
-                "link: <a href='https://horizon-centers.com/confirm-email/" + user.Id + "/dfsasvvxcvzxadsgdbncdghfndfdasdcasdfdfsdfasd" +
+                "link: <a href='https://horizon-centers.com/confirm-email/" + user.Id + "/" + token +
                 "'>Confirm Email</a>");
 
             // Ensure the user role exists
