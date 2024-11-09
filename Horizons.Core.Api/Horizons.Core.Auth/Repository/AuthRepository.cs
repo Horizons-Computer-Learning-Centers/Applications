@@ -129,6 +129,17 @@ namespace Horizons.Core.Auth.Repository
                 };
             }
 
+            // Check if email is confirmed
+            var emailConfirmed = await _userManager.IsEmailConfirmedAsync(user);
+            if (!emailConfirmed)
+            {
+                return new RequestResponse
+                {
+                    IsSuccess = false,
+                    Message = "Email not confirmed"
+                };
+            }
+
             // Check password validity
             var isPasswordValid = await _userManager.CheckPasswordAsync(user, loginDto.Password);
             if (!isPasswordValid)
