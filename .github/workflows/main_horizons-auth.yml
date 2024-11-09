@@ -79,7 +79,8 @@ jobs:
           $content = @"
           {
             "ConnectionStrings": {
-              "AuthContext": "${{ secrets.AUTH_CONNECTION_STRING }}"
+              "AuthContext": "${{ secrets.AUTH_CONNECTION_STRING }}",
+              "CommunicationServices": "${{ COMMUNICATION_SERVICES_CONNECTION_STRING }}"
             },
             "Jwt": {
               "JwtKey": "${{ secrets.JWT_KEY }}",
