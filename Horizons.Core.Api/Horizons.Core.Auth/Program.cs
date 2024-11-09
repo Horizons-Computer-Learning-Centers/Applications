@@ -1,3 +1,4 @@
+using Horizons.Core.Auth.Configuration;
 using Horizons.Core.Auth.Identity;
 using Horizons.Core.Auth.Identity.Interface;
 using Horizons.Core.Auth.Models;
@@ -14,6 +15,10 @@ var corsPolicy = "_corsPolicy";
 var jwtOptions = new JwtOptions();
 builder.Configuration.GetSection("Jwt").Bind(jwtOptions);
 builder.Services.AddSingleton(jwtOptions);
+
+var appUrlOptions = new AppUrlSettings();
+builder.Configuration.GetSection("AppUrls").Bind(appUrlOptions);
+builder.Services.AddSingleton(appUrlOptions);
 
 builder.Services.AddDbContext<AuthContext>(option =>
 {

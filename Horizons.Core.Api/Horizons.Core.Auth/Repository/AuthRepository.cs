@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Web;
+using Horizons.Core.Auth.Configuration;
 using Horizons.Core.Auth.Constants;
 using Horizons.Core.Auth.Dtos;
 using Horizons.Core.Auth.Identity.Interface;
@@ -7,11 +8,13 @@ using Horizons.Core.Auth.Models;
 using Horizons.Core.Auth.Repository.Interface;
 using Horizons.Core.Auth.Service.Interface;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 
 namespace Horizons.Core.Auth.Repository
 {
     public class AuthRepository : IAuthRepository
     {
+        private readonly AppUrlSettings _appUrlSettings;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
@@ -19,12 +22,14 @@ namespace Horizons.Core.Auth.Repository
         private readonly IMailSender _mailSender;
 
         public AuthRepository(
+            AppUrlSettings appUrlSettings,
             UserManager<ApplicationUser> userManager, 
             RoleManager<IdentityRole> roleManager,
             SignInManager<ApplicationUser> signInManager,
             IJwtProvider jwtProviders, 
             IMailSender mailSender)
         {
+            _appUrlSettings = appUrlSettings;
             _userManager = userManager;
             _roleManager = roleManager;
             _signInManager = signInManager;
@@ -71,7 +76,7 @@ namespace Horizons.Core.Auth.Repository
             await _mailSender.SendEmailAsync(
                 user.Email, "Email Confirmation",
                 "Please confirm your email by clicking this " +
-                "link: <a href='https://horizon-centers.com/confirm-email/" + user.Id + "/" + token +
+                "link: <a href='" + _appUrlSettings.Frontend + "/confirm-email/" + user.Id + "/" + token +
                 "'>Confirm Email</a>");
 
             // Ensure the user role exists
@@ -215,7 +220,7 @@ namespace Horizons.Core.Auth.Repository
                 return new RequestResponse { IsSuccess = false, Message = "User not found" };
             }
 
-            token = WebUtility.UrlDecode(token);
+            //token = WebUtility.UrlDecode(token);
             var result = await _userManager.ConfirmEmailAsync(user, token);
             if (result.Succeeded)
             {
