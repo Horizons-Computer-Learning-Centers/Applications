@@ -38,6 +38,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<IMailSender, MailSender>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

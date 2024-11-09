@@ -3,6 +3,7 @@ using Horizons.Core.Auth.Dtos;
 using Horizons.Core.Auth.Identity.Interface;
 using Horizons.Core.Auth.Models;
 using Horizons.Core.Auth.Repository.Interface;
+using Horizons.Core.Auth.Service.Interface;
 using Microsoft.AspNetCore.Identity;
 
 namespace Horizons.Core.Auth.Repository
@@ -13,17 +14,20 @@ namespace Horizons.Core.Auth.Repository
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IJwtProvider _jwtProviders;
+        private readonly IMailSender _mailSender;
 
         public AuthRepository(
             UserManager<ApplicationUser> userManager, 
             RoleManager<IdentityRole> roleManager,
             SignInManager<ApplicationUser> signInManager,
-            IJwtProvider jwtProviders)
+            IJwtProvider jwtProviders, 
+            IMailSender mailSender)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _signInManager = signInManager;
             _jwtProviders = jwtProviders;
+            _mailSender = mailSender;
         }
 
         public async Task<RequestResponse> Register(RegistrationRequest register)
@@ -58,6 +62,12 @@ namespace Horizons.Core.Auth.Repository
                     IsSuccess = false
                 };
             }
+            
+            await _mailSender.SendEmailAsync(
+                user.Email, "Email Confirmation", 
+                "Please confirm your email by clicking this " +
+                "link: <a href='https://horizons-centers.com/confirm-email?userId=" + user.Id + "&token=" + await _userManager.GenerateEmailConfirmationTokenAsync(user) + 
+                "'>Confirm Email</a>");
 
             // Ensure the user role exists
             if (!await _roleManager.RoleExistsAsync(HorizonsCoreAuthRoles.UserRole))
