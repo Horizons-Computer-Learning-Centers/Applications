@@ -19,7 +19,7 @@ export class ConfirmEmailComponent implements OnInit {
   ngOnInit(): void {
     const userId = this.route.snapshot.paramMap.get('userId');
     console.log(userId);
-    const token = this.route.snapshot.paramMap.get('token');
+    let token = this.route.snapshot.paramMap.get('token');
     console.log(token);
 
     // if (userId && token) {
@@ -27,6 +27,7 @@ export class ConfirmEmailComponent implements OnInit {
     // }
 
     if (userId && token) {
+      token = decodeURIComponent(token);
       this.authService
         .confirmEmail(userId, token)
         .pipe(
