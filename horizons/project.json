@@ -21,7 +21,11 @@
           "./src/staticwebapp.config.json"
         ],
         "styles": [
-          "node_modules/bootstrap/dist/css/bootstrap.css",
+          "src/assets/scss/main.scss",
+          "src/assets/scss/utility.scss",
+          "node_modules/bootstrap-icons/font/bootstrap-icons.scss",
+          "node_modules/ngx-toastr/toastr.css",
+          "node_modules/boxicons/css/boxicons.css",
           "./src/styles.scss"
         ],
         "scripts": [

@@ -1,4 +1,9 @@
-<h1>Confirm your email</h1>
+<h1 class="text-center mb-2 text-muted">Email Confirmed</h1>
+<div class="mb-5">
+  <div class="form-text text-center">
+    <a [routerLink]="['/auth/login']">Sign in</a>
+  </div>
+</div>
 
 <div *ngIf="successMessage?.isSuccess" class="alert alert-success" role="alert">
   Your email was confirmed.

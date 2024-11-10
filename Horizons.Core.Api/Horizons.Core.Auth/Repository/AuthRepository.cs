@@ -74,7 +74,7 @@ namespace Horizons.Core.Auth.Repository
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             token = WebUtility.UrlEncode(token);
 
-            var message = $"Please confirm your email by clicking this link: <a href='{_appUrlSettings.Frontend}/confirm-email/{user.Id}/{token}'>Confirm Email</a>";
+            var message = $"Please confirm your email by clicking this link: <a href='{_appUrlSettings.Frontend}/auth/confirm-email/{user.Id}/{token}'>Confirm Email</a>";
             await _mailSender.SendEmailAsync(user.Email, "Email Confirmation", message);
 
             // Ensure the user role exists
@@ -97,7 +97,7 @@ namespace Horizons.Core.Auth.Repository
 
             return new RequestResponse
             {
-                ResponseType = ResponseTypeEnum.UserAddedToRole,
+                ResponseType = ResponseTypeEnum.UserCreated,
                 Message = "User was created",
                 IsSuccess = true
             };
@@ -189,7 +189,7 @@ namespace Horizons.Core.Auth.Repository
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
             token = WebUtility.UrlEncode(token);
 
-            var message = $"Please reset your password by clicking this link: <a href='{_appUrlSettings.Frontend}/reset-password/{user.Email}/{token}'>Reset Password</a>";
+            var message = $"Please reset your password by clicking this link: <a href='{_appUrlSettings.Frontend}/auth/reset-password/{user.Email}/{token}'>Reset Password</a>";
             await _mailSender.SendEmailAsync(user.Email, "Reset Password", message);
 
             return new RequestResponse
