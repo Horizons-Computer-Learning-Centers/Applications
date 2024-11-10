@@ -2,6 +2,7 @@
 using Horizons.Core.Auth.Configuration;
 using Horizons.Core.Auth.Constants;
 using Horizons.Core.Auth.Dtos;
+using Horizons.Core.Auth.Enums;
 using Horizons.Core.Auth.Identity.Interface;
 using Horizons.Core.Auth.Models;
 using Horizons.Core.Auth.Repository.Interface;
@@ -42,6 +43,7 @@ namespace Horizons.Core.Auth.Repository
             {
                 return new RequestResponse
                 {
+                    ResponseType = ResponseTypeEnum.UserAlreadyExists,
                     Message = "User already exists",
                     IsSuccess = false
                 };
@@ -63,6 +65,7 @@ namespace Horizons.Core.Auth.Repository
             {
                 return new RequestResponse
                 {
+                    ResponseType = ResponseTypeEnum.UserNotCreated,
                     Message = result.Errors.First().Description,
                     IsSuccess = false
                 };
@@ -71,11 +74,8 @@ namespace Horizons.Core.Auth.Repository
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             token = WebUtility.UrlEncode(token);
 
-            await _mailSender.SendEmailAsync(
-                user.Email, "Email Confirmation",
-                "Please confirm your email by clicking this " +
-                "link: <a href='" + _appUrlSettings.Frontend + "/confirm-email/" + user.Id + "/" + token +
-                "'>Confirm Email</a>");
+            var message = $"Please confirm your email by clicking this link: <a href='{_appUrlSettings.Frontend}/confirm-email/{user.Id}/{token}'>Confirm Email</a>";
+            await _mailSender.SendEmailAsync(user.Email, "Email Confirmation", message);
 
             // Ensure the user role exists
             if (!await _roleManager.RoleExistsAsync(HorizonsCoreAuthRoles.UserRole))
@@ -85,6 +85,7 @@ namespace Horizons.Core.Auth.Repository
                 {
                     return new RequestResponse
                     {
+                        ResponseType = ResponseTypeEnum.RoleNotCreated,
                         Message = roleCreationResult.Errors.First().Description,
                         IsSuccess = false
                     };
@@ -96,6 +97,7 @@ namespace Horizons.Core.Auth.Repository
 
             return new RequestResponse
             {
+                ResponseType = ResponseTypeEnum.UserAddedToRole,
                 Message = "User was created",
                 IsSuccess = true
             };
@@ -107,13 +109,14 @@ namespace Horizons.Core.Auth.Repository
             return user != null;
         }
 
-        public async Task<RequestResponse> Login(LoginRequest? loginDto)
+        public async Task<RequestResponse> Login(LoginRequest loginDto)
         {
             // Validate input
             if (loginDto == null || string.IsNullOrWhiteSpace(loginDto.Email) || string.IsNullOrWhiteSpace(loginDto.Password))
             {
                 return new RequestResponse
                 {
+                    ResponseType = ResponseTypeEnum.InvalidLogin,
                     IsSuccess = false,
                     Message = "Invalid login request"
                 };
@@ -124,6 +127,7 @@ namespace Horizons.Core.Auth.Repository
             {
                 return new RequestResponse
                 {
+                    ResponseType = ResponseTypeEnum.UserNotFound,
                     IsSuccess = false,
                     Message = "User not found"
                 };
@@ -135,6 +139,7 @@ namespace Horizons.Core.Auth.Repository
             {
                 return new RequestResponse
                 {
+                    ResponseType = ResponseTypeEnum.EmailNotConfirmed,
                     IsSuccess = false,
                     Message = "Email not confirmed"
                 };
@@ -146,6 +151,7 @@ namespace Horizons.Core.Auth.Repository
             {
                 return new RequestResponse
                 {
+                    ResponseType = ResponseTypeEnum.InvalidPassword,
                     IsSuccess = false,
                     Message = "Incorrect password"
                 };
@@ -167,11 +173,11 @@ namespace Horizons.Core.Auth.Repository
                     Token = token
                 },
                 IsSuccess = true,
-                Message = "Login successful"
+                Message = "Login successful",
+                ResponseType = ResponseTypeEnum.LoginSuccess,
             };
         }
-
-
+        
         public async Task<RequestResponse> ForgotPassword(ForgotPasswordRequest model)
         {
             var user = await _userManager.FindByEmailAsync(model.Email);
@@ -181,10 +187,18 @@ namespace Horizons.Core.Auth.Repository
             }
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-            // Here you would typically send the token to the user's email.
-            // For example, you might use an email service to send the token.
+            token = WebUtility.UrlEncode(token);
 
-            return new RequestResponse { IsSuccess = true, Message = "Password reset token generated", Result = token };
+            var message = $"Please reset your password by clicking this link: <a href='{_appUrlSettings.Frontend}/reset-password/{user.Email}/{token}'>Reset Password</a>";
+            await _mailSender.SendEmailAsync(user.Email, "Reset Password", message);
+
+            return new RequestResponse
+            {
+                IsSuccess = true,
+                Message = "Password reset token generated",
+                ResponseType = ResponseTypeEnum.PasswordResetTokenGenerated,
+                Result = null
+            };
         }
 
         public async Task<RequestResponse> ResetPassword(ResetPasswordRequest model)
@@ -195,7 +209,8 @@ namespace Horizons.Core.Auth.Repository
                 return new RequestResponse
                 {
                     IsSuccess = false,
-                    Message = "User does not exist"
+                    Message = "User does not exist",
+                    ResponseType = ResponseTypeEnum.UserNotFound,
                 };
             }
 
@@ -207,17 +222,28 @@ namespace Horizons.Core.Auth.Repository
                 return new RequestResponse
                 {
                     IsSuccess = false,
-                    Message = "Invalid or expired token"
+                    Message = "Invalid or expired token",
+                    ResponseType = ResponseTypeEnum.PasswordResetTokenInvalid,
                 };
             }
             
             var result = await _userManager.ResetPasswordAsync(user, model.Token, model.NewPassword);
             if (result.Succeeded)
             {
-                return new RequestResponse { IsSuccess = true, Message = "Password reset successful" };
+                return new RequestResponse
+                {
+                    IsSuccess = true,
+                    Message = "Password reset successful",
+                    ResponseType = ResponseTypeEnum.PasswordResetSuccess,
+                };
             }
 
-            return new RequestResponse { IsSuccess = false, Message = "Password reset failed" };
+            return new RequestResponse
+            {
+                IsSuccess = false, 
+                Message = "Password reset failed",
+                ResponseType = ResponseTypeEnum.PasswordResetFailed,
+            };
 
         }
 
@@ -226,27 +252,31 @@ namespace Horizons.Core.Auth.Repository
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                return new RequestResponse { IsSuccess = false, Message = "User not found" };
+                return new RequestResponse
+                {
+                    IsSuccess = false,
+                    Message = "User not found",
+                    ResponseType = ResponseTypeEnum.UserNotFound,
+                };
             }
 
             var result = await _userManager.ConfirmEmailAsync(user, token);
             if (result.Succeeded)
             {
-                return new RequestResponse { IsSuccess = true, Message = "Email confirmed successfully" };
-            }
-
-            return new RequestResponse { IsSuccess = false, Message = result.Errors.First().Description };
-        }
-
-        private async Task CreateRole(List<string> roles)
-        {
-            foreach (var role in roles)
-            {
-                if (!_roleManager.RoleExistsAsync(role).GetAwaiter().GetResult())
+                return new RequestResponse
                 {
-                    await _roleManager.CreateAsync(new IdentityRole(role));
-                }
+                    IsSuccess = true,
+                    Message = "Email confirmed successfully",
+                    ResponseType = ResponseTypeEnum.EmailConfirmed,
+                };
             }
+
+            return new RequestResponse
+            {
+                IsSuccess = false,
+                Message = result.Errors.First().Description,
+                ResponseType = ResponseTypeEnum.EmailNotConfirmed,
+            };
         }
     }
 }

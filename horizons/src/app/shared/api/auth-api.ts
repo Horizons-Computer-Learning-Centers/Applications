@@ -27,12 +27,6 @@ export interface IAuthService {
      */
     login(body: LoginRequest | undefined): Observable<RequestResponse>;
     /**
-     * @param email (optional) 
-     * @param body (optional) 
-     * @return Success
-     */
-    assignRole(email: string | undefined, body: string[] | undefined): Observable<string[]>;
-    /**
      * @param body (optional) 
      * @return Success
      */
@@ -163,66 +157,6 @@ export class AuthService implements IAuthService {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             let result200: any = null;
             result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as RequestResponse;
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    /**
-     * @param email (optional) 
-     * @param body (optional) 
-     * @return Success
-     */
-    assignRole(email: string | undefined, body: string[] | undefined): Observable<string[]> {
-        let url_ = this.baseUrl + "/api/auth/assign-role?";
-        if (email === null)
-            throw new Error("The parameter 'email' cannot be null.");
-        else if (email !== undefined)
-            url_ += "email=" + encodeURIComponent("" + email) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(body);
-
-        let options_ : any = {
-            body: content_,
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json",
-                "Accept": "text/plain"
-            })
-        };
-
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processAssignRole(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processAssignRole(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<string[]>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<string[]>;
-        }));
-    }
-
-    protected processAssignRole(response: HttpResponseBase): Observable<string[]> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result200: any = null;
-            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as string[];
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -425,6 +359,7 @@ export interface RegistrationRequest {
 export interface RequestResponse {
     result?: any | undefined;
     isSuccess?: boolean;
+    responseType?: ResponseTypeEnum;
     message?: string | undefined;
 }
 
@@ -432,6 +367,48 @@ export interface ResetPasswordRequest {
     email?: string | undefined;
     token?: string | undefined;
     newPassword?: string | undefined;
+}
+
+export enum ResponseTypeEnum {
+    _0 = 0,
+    _1 = 1,
+    _2 = 2,
+    _3 = 3,
+    _4 = 4,
+    _5 = 5,
+    _6 = 6,
+    _7 = 7,
+    _8 = 8,
+    _9 = 9,
+    _10 = 10,
+    _11 = 11,
+    _12 = 12,
+    _13 = 13,
+    _14 = 14,
+    _15 = 15,
+    _16 = 16,
+    _17 = 17,
+    _18 = 18,
+    _19 = 19,
+    _20 = 20,
+    _21 = 21,
+    _22 = 22,
+    _23 = 23,
+    _24 = 24,
+    _25 = 25,
+    _26 = 26,
+    _27 = 27,
+    _28 = 28,
+    _29 = 29,
+    _30 = 30,
+    _31 = 31,
+    _32 = 32,
+    _33 = 33,
+    _34 = 34,
+    _35 = 35,
+    _36 = 36,
+    _37 = 37,
+    _38 = 38,
 }
 
 export class ApiException extends Error {
