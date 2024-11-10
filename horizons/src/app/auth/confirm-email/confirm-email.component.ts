@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { AuthService } from '../../shared/api/auth-api';
+import { AuthService, ResponseTypeEnum } from '../../shared/api/auth-api';
 import { catchError, of } from 'rxjs';
 
 @Component({
@@ -18,13 +18,7 @@ export class ConfirmEmailComponent implements OnInit {
 
   ngOnInit(): void {
     const userId = this.route.snapshot.paramMap.get('userId');
-    console.log(userId);
     let token = this.route.snapshot.paramMap.get('token');
-    console.log(token);
-
-    // if (userId && token) {
-    //   this.authService.confirmEmail(userId, token).subscribe((response) => {});
-    // }
 
     if (userId && token) {
       token = decodeURIComponent(token);
