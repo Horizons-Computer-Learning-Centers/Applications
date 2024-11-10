@@ -7,6 +7,10 @@ import { SharedModule } from './shared/shared.module';
 import { API_BASE_URL } from './shared/api/api';
 import { AUTH_BASE_URL } from './shared/api/auth-api';
 import { AuthModule } from './auth/auth.module';
+import { RootModule } from './^state/root.module';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { SpinnerInterceptor } from './shared/interceptors/spinner/spinner.interceptor';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 const baseUrl = isDevMode()
   ? 'https://localhost:5001'
@@ -16,9 +20,11 @@ const baseUrl = isDevMode()
   declarations: [AppComponent],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     SharedModule,
     AuthModule,
     RouterModule.forRoot(appRoutes, { initialNavigation: 'enabledBlocking' }),
+    RootModule,
   ],
   providers: [
     {
@@ -28,6 +34,11 @@ const baseUrl = isDevMode()
     {
       provide: AUTH_BASE_URL,
       useValue: baseUrl,
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: SpinnerInterceptor,
+      multi: true,
     },
   ],
   bootstrap: [AppComponent],
