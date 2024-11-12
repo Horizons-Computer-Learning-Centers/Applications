@@ -10,5 +10,6 @@ namespace Horizons.Core.Auth.Service.Interface
         Task<RequestResponse> ForgotPassword(ForgotPasswordRequest model);
         Task<RequestResponse> ResetPassword(ResetPasswordRequest model);
         Task<RequestResponse> ConfirmEmail(string userId, string token);
+        Task<bool> ValidateToken(string token);
     }
 }
