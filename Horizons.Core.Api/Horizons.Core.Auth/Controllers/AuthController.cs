@@ -56,5 +56,11 @@ namespace Horizons.Core.Auth.Controllers
         {
             return await _authService.ConfirmEmail(userId, token);
         }
+
+        [HttpPost("validate-token")]
+        public async Task<bool> ValidateToken(TokenValidationDto tokenValidationDto)
+        {
+            return await _authService.ValidateToken(tokenValidationDto.Token);
+        }
     }
 }
